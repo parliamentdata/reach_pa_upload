@@ -9,8 +9,17 @@ data = pd.read_excel(excel_path)
 # Select specified columns
 data_subset = data[['rcdts', 'date']]
 
-# Convert 'date' column to datetime and format as mm/dd/yyyy
-data_subset['date'] = pd.to_datetime(data_subset['date']).dt.strftime('%m/%d/%Y')
+# Convert 'date' column to datetime
+data_subset['date'] = pd.to_datetime(data_subset['date'])
+
+# Sort by 'rcdts' and 'date' to ensure the oldest row comes first
+data_subset = data_subset.sort_values(by=['rcdts', 'date'])
+
+# Remove duplicates based on 'rcdts', keeping the first (oldest) row
+data_subset = data_subset.drop_duplicates(subset=['rcdts'], keep='first')
+
+# Reformat 'date' column as mm/dd/yyyy for SQL upload
+data_subset['date'] = data_subset['date'].dt.strftime('%m/%d/%Y')
 
 # Path to your config.yml file
 config_file_path = "../utility/config.yml"
